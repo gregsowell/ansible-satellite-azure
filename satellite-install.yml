@@ -28,3 +28,6 @@
   - name: This role installs ansible on the server
     include_role:
       name: ansible-role-satellite
+
+  - name: Quick reboot to clean it all up
+    reboot:
