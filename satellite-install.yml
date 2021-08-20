@@ -1,0 +1,30 @@
+---
+- name: install satellite
+  hosts: greg-satellite2
+  gather_facts: false
+  vars:
+    # FQDN of your satellite server
+    new_host_name: satellite2.gregsowell.com
+    # Your redhat logon/pass in order to pull the subscription info
+    rhn_username: My@user.name
+    rhn_password: MyP@55w0rdBr0
+    # The username/password for an administrator on the satellite server
+    sat_username: admin
+    sat_password: tacostacos
+
+  tasks:
+  - name: set FQDN on the sat server(it requires this)
+    command: "hostnamectl set-hostname {{ new_host_name }}"
+
+  - name: edit hosts file and add the FQDN in so the server can reverse the entry also
+    shell:  "echo {{ hostvars[inventory_hostname]['ansible_host'] }}  {{ new_host_name }} >> /etc/hosts"
+
+#  - name: register the server if you like
+#    shell:  "subscription-manager register --username {{ rhn_username }} --password {{ rhn_password }} --auto-attach"
+
+  - name: do an update on the server
+    command: yum update -y
+
+  - name: This role installs ansible on the server
+    include_role:
+      name: ansible-role-satellite
