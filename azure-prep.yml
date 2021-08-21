@@ -3,31 +3,32 @@
   hosts: localhost
   gather_facts: false
   vars:
+    RG_name: cloud-shell-storage-eastus
   tasks:
   - name: Create storage account
 #    azure.azcollection.azure_rm_storageaccount:
     azure_rm_storageaccount:
-      resource_group: cloud-shell-storage-eastus
+      resource_group: "{{ RG_name }}"
 # name of the storage container needs to be globally unique
       name: gsowell002
       account_type: Standard_LRS
 
   - name: Create virtual network
     azure_rm_virtualnetwork:
-      resource_group: cloud-shell-storage-eastus
+      resource_group: "{{ RG_name }}"
       name: testvn001
       address_prefixes: "172.29.0.0/16"
 
   - name: Add subnet
     azure_rm_subnet:
-      resource_group: cloud-shell-storage-eastus
+      resource_group: "{{ RG_name }}"
       name: subnet001
       address_prefix: "172.29.0.0/24"
       virtual_network: testvn001
 
   - name: Create security group that allows SSH
     azure_rm_securitygroup:
-      resource_group: cloud-shell-storage-eastus
+      resource_group: "{{ RG_name }}"
       name: secgroup001
       rules:
         - name: SSH
@@ -37,9 +38,9 @@
           priority: 101
           direction: Inbound
 
-  - name: Create NIC
+  - name: Create NIC for testing purposes
     azure_rm_networkinterface:
-      resource_group: cloud-shell-storage-eastus
+      resource_group: "{{ RG_name }}"
       name: testnic001
       virtual_network: testvn001
       subnet: subnet001
@@ -47,7 +48,7 @@
 
   - name: Create public ip
     azure_rm_publicipaddress:
-      resource_group: cloud-shell-storage-eastus
+      resource_group: "{{ RG_name }}"
       allocation_method: Dynamic
       name: vgwipaddr
 
@@ -55,14 +56,14 @@
 
   - name: Add gateway subnet for VPN tunnel
     azure_rm_subnet:
-      resource_group: cloud-shell-storage-eastus
+      resource_group: "{{ RG_name }}"
       name: GatewaySubnet
       address_prefix: "172.29.1.0/27"
       virtual_network: testvn001
 
   - name: Create virtual network gateway for VPN tunnel
     azure_rm_virtualnetworkgateway:
-      resource_group: cloud-shell-storage-eastus
+      resource_group: "{{ RG_name }}"
       name: GregVirtualNetworkGateway
       ip_configurations:
         - name: testipconfig
