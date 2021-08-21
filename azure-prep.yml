@@ -46,13 +46,12 @@
       subnet: subnet001
       security_group: secgroup001
 
+# only complete this portion for VPN tunnel building
   - name: Create public ip
     azure_rm_publicipaddress:
       resource_group: "{{ RG_name }}"
       allocation_method: Dynamic
       name: vgwipaddr
-
-# only complete this portion for VPN tunnel building
 
   - name: Add gateway subnet for VPN tunnel
     azure_rm_subnet:
