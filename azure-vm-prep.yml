@@ -1,0 +1,69 @@
+---
+- name: azure deployments initial playbook.  Setup VM and call further update playbooks.
+  hosts: all
+  gather_facts: false
+  vars:
+  tasks:
+#  - name: show hostvars
+#    debug:
+#      var: hostvars[inventory_hostname]
+
+#  - name: show ansible_host
+#    debug:
+#      var: ansible_host
+
+  - name: Make sure the host key doesn't already exist
+    lineinfile:
+      path: /var/lib/awx/.ssh/known_hosts
+      state: absent
+      regexp: "^{{ ansible_host }}"
+    delegate_to: localhost
+    become: true
+
+#  - name: Set content in /etc/motd 
+#    become: true
+#    copy:
+#      content: "Ansible configured MOTD for {{ inventory_hostname }}"
+#      dest: /etc/motd
+#      mode: 644
+#      owner: root
+#      group: root
+
+  - name: set hostname as FQDN
+    lineinfile:
+      path: /etc/selinux/config
+      regexp: '^127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 localhost4 localhost4.localdomain4'
+      line: "127.0.0.1   {{ inventory_hostname }} localhost"
+    become: true
+
+  - name: download pre-built bootstrap RPM
+    shell: curl --insecure --output /home/ansible/katello-ca-consumer-latest.noarch.rpm https://satellite.gregsowell.com/pub/katello-ca-consumer-latest.noarch.rpm
+    become: true
+
+  - name: install pre-built bootstrap RPM
+    shell: yum -y localinstall /home/ansible/katello-ca-consumer-latest.noarch.rpm 
+    become: true
+
+  - name: Create manual katello facts file so that it will register back to satellite properly.
+    ansible.builtin.copy:
+      content: '{"network.fqdn":"{{ inventory_hostname }}"}'
+      dest: /etc/rhsm/facts/katello.facts
+    become: true
+
+  - name: register system with satellite server
+    shell: subscription-manager register --force --org="NASA_JPL" --activationkey="test-activation-key"
+#    shell: subscription-manager register --force --name={{ inventory_hostname }} --org="NASA_JPL" --activationkey="test-activation-key"
+    become: true
+
+  - name: install satellite tools
+    command: subscription-manager repos --enable=rhel-7-server-satellite-tools-6.9-rpms
+    become: true
+
+  - name: Install katello packages
+    yum:
+      name:
+        - katello-host-tools
+        - katello-host-tools-tracer
+        - katello-agent
+      state: latest
+    become: true
