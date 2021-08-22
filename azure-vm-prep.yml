@@ -37,7 +37,7 @@
     become: true
 
   - name: download pre-built bootstrap RPM
-    shell: curl --insecure --output /home/ansible/katello-ca-consumer-latest.noarch.rpm https://satellite.gregsowell.com/pub/katello-ca-consumer-latest.noarch.rpm
+    shell: curl --insecure --output /home/ansible/katello-ca-consumer-latest.noarch.rpm https://satellite2.gregsowell.com/pub/katello-ca-consumer-latest.noarch.rpm
     become: true
 
   - name: install pre-built bootstrap RPM
@@ -51,7 +51,7 @@
     become: true
 
   - name: register system with satellite server
-    shell: subscription-manager register --force --org="NASA_JPL" --activationkey="test-activation-key"
+    shell: subscription-manager register --force --org="NASA_JPL" --activationkey="library-activation"
 #    shell: subscription-manager register --force --name={{ inventory_hostname }} --org="NASA_JPL" --activationkey="test-activation-key"
     become: true
 
