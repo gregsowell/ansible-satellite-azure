@@ -20,14 +20,14 @@
     delegate_to: localhost
     become: true
 
-#  - name: Set content in /etc/motd 
-#    become: true
-#    copy:
-#      content: "Ansible configured MOTD for {{ inventory_hostname }}"
-#      dest: /etc/motd
-#      mode: 644
-#      owner: root
-#      group: root
+  - name: Set content in /etc/motd 
+    become: true
+    copy:
+      content: "Ansible configured MOTD for {{ inventory_hostname }}"
+      dest: /etc/motd
+      mode: 644
+      owner: root
+      group: root
 
   - name: set hostname as FQDN
     lineinfile:
