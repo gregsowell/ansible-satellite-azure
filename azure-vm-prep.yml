@@ -31,9 +31,13 @@
 
   - name: set hostname as FQDN
     lineinfile:
-      path: /etc/selinux/config
+      path: /etc/hosts
       regexp: '^127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 localhost4 localhost4.localdomain4'
       line: "127.0.0.1   {{ inventory_hostname }} localhost"
+    become: true
+
+  - name: set FQDN on the sat server(it requires this)
+    command: "hostnamectl set-hostname {{ inventory_hostname }}"
     become: true
 
   - name: download pre-built bootstrap RPM
