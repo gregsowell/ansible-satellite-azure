@@ -1,0 +1,9 @@
+---
+- name: Test just for John
+  hosts: all
+  gather_facts: false
+  vars:
+  tasks:
+  - name: debug a hello world message
+    debug:
+      msg: hello world!
